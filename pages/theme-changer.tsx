@@ -10,20 +10,24 @@ interface Props {
   theme: string;
 }
 
-export const ThemeChangerPage:FC<Props> = (props) => {
-  console.log(props);
-  const [currentTheme, setCurrentTheme] = useState('light')
-  const onThemeChange = ( event: ChangeEvent<HTMLInputElement>) => {
+export const ThemeChangerPage: FC<Props> = ({ theme }) => {
+
+  const [currentTheme, setCurrentTheme] = useState(theme)
+
+
+  const onThemeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedTheme = event.target.value;
     setCurrentTheme(selectedTheme);
 
-    Cookies.set('theme', selectedTheme );
+    Cookies.set('theme', selectedTheme);
   }
 
-  const onClick = async() =>{
+  const onClick = async () => {
     const { data } = await axios.get('/api/hello')
-    console.log({data})
+    console.log({ data })
   }
+
+
 
   return (
     <Layout>
@@ -31,8 +35,8 @@ export const ThemeChangerPage:FC<Props> = (props) => {
         <CardContent>
           <FormControl>
             <FormLabel>Tema</FormLabel>
-            <RadioGroup 
-              onChange={ onThemeChange }
+            <RadioGroup
+              onChange={onThemeChange}
               value={currentTheme}
             >
               <FormControlLabel value='light' control={<Radio />} label="Light" />
@@ -41,7 +45,7 @@ export const ThemeChangerPage:FC<Props> = (props) => {
             </RadioGroup>
           </FormControl>
           <Button
-            onClick={ onClick }
+            onClick={onClick}
           >
             Solicitud
           </Button>
@@ -55,11 +59,14 @@ export const ThemeChangerPage:FC<Props> = (props) => {
 // - Only if you need to pre-render a page whose data must be fetched at request time
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { theme ='light', name ='No name'} = req.cookies;
+  
+  const { theme = 'dark', name = 'No name' } = req.cookies;
+
+  const validThemes = ['light', 'dark', 'custom'];
 
   return {
     props: {
-      theme,
+      theme: validThemes.includes(theme) ? theme : 'dark',
       name
     }
   }
